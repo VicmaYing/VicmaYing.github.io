@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VICMA — Portfolio 作品集</title>
+<meta name="description" content="漠然 · 个人作品集 — 设计、创作与思考" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     Design Tokens
+  ============================================================ */
+  :root {
+    --ivory:      #0d0b09;
+    --ivory-deep: #141009;
+    --ink:        #f1e8d5;
+    --ink-soft:   #bcae94;
+    --muted:      #8a7c63;
+    --line:       #2c2519;
+    --gold:       #c9a44e;
+    --gold-light: #e7c877;
+
+    --serif-en: "Cormorant Garamond", Georgia, serif;
+    --serif-cn: "Noto Serif SC", "Songti SC", serif;
+    --serif:    var(--serif-en), var(--serif-cn);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --gutter: clamp(1.5rem, 5vw, 6rem);
+    --maxw: 1440px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+  body {
+    background: var(--ivory);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Subtle paper grain for premium tactility */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection { background: var(--gold); color: var(--ivory); }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ============================================================
+     Custom Cursor
+  ============================================================ */
+  .cursor-dot, .cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+  }
+  .cursor-dot { width: 6px; height: 6px; background: #fff; }
+  .cursor-ring {
+    width: 40px; height: 40px;
+    border: 1px solid #fff;
+    transition: width .3s var(--ease), height .3s var(--ease), background .3s var(--ease);
+  }
+  .cursor-ring.hover { width: 66px; height: 66px; background: rgba(255,255,255,.08); }
+  @media (hover: none) { body { cursor: auto; } .cursor-dot, .cursor-ring { display: none; } }
+
+  /* ============================================================
+     Preloader
+  ============================================================ */
+  #preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: var(--ivory);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: opacity .8s var(--ease), visibility .8s var(--ease);
+  }
+  #preloader.done { opacity: 0; visibility: hidden; }
+  .pre-count {
+    font-family: var(--serif-en);
+    font-size: clamp(4rem, 14vw, 11rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .pre-label {
+    margin-top: 1rem;
+    font-size: .75rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-left: 0.5em;
+  }
+
+  /* ============================================================
+     Navigation
+  ============================================================ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.6rem var(--gutter);
+    mix-blend-mode: difference;
+    color: #fff;
+  }
+  .nav-logo {
+    font-family: var(--serif-en);
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .nav-logo span { font-style: italic; color: var(--gold-light); }
+  .nav-links { display: flex; gap: 2.2rem; align-items: center; }
+  .nav-links a {
+    font-size: .72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 3px;
+  }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 0; height: 1px;
+    background: currentColor;
+    transition: width .4s var(--ease);
+  }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-menu-btn { display: none; }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+  }
+
+  /* ============================================================
+     Layout helpers
+  ============================================================ */
+  section { position: relative; padding: clamp(6rem, 14vh, 12rem) var(--gutter); }
+  .wrap { max-width: var(--maxw); margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    font-size: .72rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 42px; height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  /* Reveal animation */
+  .reveal { opacity: 0; transform: translateY(38px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: .12s; }
+  .reveal.d2 { transition-delay: .24s; }
+  .reveal.d3 { transition-delay: .36s; }
+
+  /* ============================================================
+     Hero
+  ============================================================ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
+  }
+  .hero-sub {
+    font-size: .78rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.6rem;
+  }
+  .hero-title {
+    font-family: var(--serif-en);
+    font-weight: 500;
+    font-size: clamp(3.4rem, 15vw, 14rem);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .hero-title em { font-style: italic; color: var(--gold); }
+  .hero-cn {
+    font-family: var(--serif-cn);
+    font-weight: 300;
+    font-size: clamp(1rem, 2.4vw, 1.7rem);
+    letter-spacing: 0.5em;
+    color: var(--ink-soft);
+    margin-top: 2rem;
+    padding-left: 0.5em;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 4rem;
+    margin-top: clamp(3rem, 8vh, 6rem);
+    padding-top: 2.2rem;
+    border-top: 1px solid var(--line);
+    max-width: 780px;
+  }
+  .hero-meta p { max-width: 34ch; font-size: 1.05rem; color: var(--ink-soft); }
+  .hero-meta .lead { font-family: var(--serif-cn); font-weight: 300; line-height: 1.9; }
+  .scroll-cue {
+    position: absolute;
+    bottom: 2.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: .62rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .scroll-cue .bar {
+    width: 1px; height: 46px;
+    background: linear-gradient(var(--ink), transparent);
+    animation: cue 2.2s var(--ease) infinite;
+    transform-origin: top;
+  }
+  @keyframes cue { 0%,100% { transform: scaleY(.3); opacity:.3 } 50% { transform: scaleY(1); opacity:1 } }
+
+  /* ============================================================
+     Marquee divider
+  ============================================================ */
+  .marquee {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+    padding: 1.6rem 0;
+    white-space: nowrap;
+  }
+  .marquee-track {
+    display: inline-flex;
+    gap: 3rem;
+    animation: scroll 32s linear infinite;
+  }
+  .marquee-track span {
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    color: var(--ink-soft);
+  }
+  .marquee-track span::after { content: "✦"; margin-left: 3rem; color: var(--gold); font-style: normal; font-size: .6em; vertical-align: middle; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  /* ============================================================
+     About
+  ============================================================ */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+  .about-portrait {
+    position: relative;
+    aspect-ratio: 4/5;
+    background:
+      linear-gradient(135deg, #1c1710, #2a2013);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .about-portrait::after {
+    content: "此处是头像";
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif-cn);
+    font-size: clamp(1.2rem, 4vw, 2.4rem);
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0.2em;
+    color: rgba(201,164,78,0.5);
+  }
+  .about-portrait .tag {
+    position: absolute;
+    bottom: 1.2rem; left: 1.2rem;
+    font-size: .68rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--ivory);
+    padding: .5rem .9rem;
+    border: 1px solid var(--line);
+  }
+  .about-title {
+    font-family: var(--serif-en);
+    font-size: clamp(2.2rem, 5vw, 4.4rem);
+    font-weight: 500;
+    line-height: 1.05;
+    margin-bottom: 2rem;
+  }
+  .about-title em { font-style: italic; color: var(--gold); }
+  .about-text {
+    font-family: var(--serif-cn);
+    font-weight: 300;
+    font-size: 1.1rem;
+    line-height: 2;
+    color: var(--ink-soft);
+    margin-bottom: 1.4rem;
+  }
+  .about-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 2.6rem;
+    padding-top: 2.2rem;
+    border-top: 1px solid var(--line);
+  }
+  .stat .num {
+    font-family: var(--serif-en);
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .stat .num sup { color: var(--gold); font-size: .5em; }
+  .stat .label {
+    font-size: .68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: .6rem;
+  }
+  @media (max-width: 860px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .about-portrait { max-width: 420px; }
+  }
+
+  /* ============================================================
+     Works
+  ============================================================ */
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: clamp(3rem, 7vh, 5rem);
+  }
+  .section-head h2 {
+    font-family: var(--serif-en);
+    font-size: clamp(2.6rem, 7vw, 6rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .section-head h2 em { font-style: italic; color: var(--gold); }
+  .section-head .cn { font-family: var(--serif-cn); font-weight: 300; color: var(--muted); letter-spacing: 0.3em; }
+
+  .works { display: flex; flex-direction: column; }
+  .work {
+    display: grid;
+    grid-template-columns: 90px 1.4fr 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    padding: 2.4rem 0;
+    border-top: 1px solid var(--line);
+    transition: padding .5s var(--ease);
+  }
+  .work:last-child { border-bottom: 1px solid var(--line); }
+  .work .idx {
+    font-family: var(--serif-en);
+    font-size: 1rem;
+    color: var(--gold);
+    font-style: italic;
+  }
+  .work .title {
+    font-family: var(--serif-en);
+    font-size: clamp(1.6rem, 3.4vw, 2.8rem);
+    font-weight: 500;
+    line-height: 1.05;
+    transition: transform .5s var(--ease), color .5s var(--ease);
+  }
+  .work .title small {
+    display: block;
+    font-family: var(--serif-cn);
+    font-weight: 300;
+    font-size: .9rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-top: .4rem;
+  }
+  .work .cat { font-size: .74rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-soft); }
+  .work .year { font-family: var(--serif-en); font-style: italic; color: var(--muted); }
+  .work .arrow {
+    justify-self: end;
+    width: 46px; height: 46px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .5s var(--ease);
+  }
+  .work:hover { padding: 3rem 0; }
+  .work:hover .title { transform: translateX(18px); color: var(--gold); }
+  .work:hover .arrow { background: var(--gold); border-color: var(--gold); color: var(--ivory); transform: rotate(-45deg); }
+
+  /* floating preview image on hover */
+  .work-preview {
+    position: fixed;
+    top: 0; left: 0;
+    width: 340px; height: 240px;
+    pointer-events: none;
+    z-index: 800;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.85);
+    transition: opacity .4s var(--ease), transform .4s var(--ease);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    background: var(--ivory-deep);
+  }
+  .work-preview.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .work-preview .pv {
+    width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif-en); font-style: italic;
+    font-size: 2rem; color: rgba(255,255,255,.8);
+  }
+  @media (max-width: 860px) {
+    .work { grid-template-columns: 40px 1fr auto; }
+    .work .cat, .work .year { display: none; }
+    .work-preview { display: none; }
+  }
+
+  /* ============================================================
+     Featured project — Puppy TrashBin gallery
+  ============================================================ */
+  .feature { background: var(--ivory-deep); }
+  .feature-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: flex-end;
+    margin-bottom: clamp(3rem, 7vh, 5rem);
+  }
+  .feature-head h2 {
+    font-family: var(--serif-en);
+    font-size: clamp(2.6rem, 7vw, 5.6rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  .feature-head h2 em { font-style: italic; color: var(--gold); }
+  .feature-head .cn {
+    font-family: var(--serif-cn);
+    font-weight: 300;
+    font-size: .95rem;
+    letter-spacing: .12em;
+    line-height: 2;
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+  .feature-meta {
+    display: flex;
+    gap: 2.4rem;
+    flex-wrap: wrap;
+    margin-top: 1.6rem;
+    font-size: .72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .feature-meta b { color: var(--ink); font-weight: 500; }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: clamp(1rem, 2vw, 1.6rem);
+  }
+  .shot {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--ivory-deep);
+    cursor: pointer;
+  }
+  .shot img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 1.2s var(--ease), filter 1.2s var(--ease);
+    filter: saturate(0.96);
+  }
+  .shot:hover img { transform: scale(1.05); filter: saturate(1.05); }
+  .shot figcaption {
+    position: absolute;
+    left: 1rem; bottom: 1rem;
+    font-size: .68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--ivory);
+    border: 1px solid var(--line);
+    padding: .45rem .8rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .5s var(--ease), transform .5s var(--ease);
+  }
+  .shot:hover figcaption { opacity: 1; transform: none; }
+  .shot.lg  { grid-column: span 4; aspect-ratio: 16/9; }
+  .shot.sm  { grid-column: span 2; aspect-ratio: 4/5; }
+  .shot.md  { grid-column: span 3; aspect-ratio: 16/10; }
+  @media (max-width: 860px) {
+    .feature-head { grid-template-columns: 1fr; }
+    .gallery { grid-template-columns: 1fr; }
+    .shot.lg, .shot.sm, .shot.md { grid-column: span 1; aspect-ratio: 16/10; }
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 9500;
+    background: rgba(20,18,15,.94);
+    display: flex; align-items: center; justify-content: center;
+    padding: 4vw;
+    opacity: 0; visibility: hidden;
+    transition: opacity .5s var(--ease), visibility .5s var(--ease);
+  }
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lightbox img {
+    max-width: 100%; max-height: 88vh;
+    object-fit: contain;
+    border: 1px solid rgba(244,239,230,.2);
+    transform: scale(.96);
+    transition: transform .5s var(--ease);
+  }
+  .lightbox.open img { transform: scale(1); }
+  .lb-close {
+    position: absolute; top: 2rem; right: 2.4rem;
+    font-family: var(--serif-en); font-size: 2rem; color: var(--ivory);
+  }
+  .lb-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    font-family: var(--serif-en); font-size: 2.4rem; color: var(--ivory);
+    padding: 1rem; opacity: .7; transition: opacity .3s var(--ease);
+  }
+  .lb-nav:hover { opacity: 1; }
+  .lb-prev { left: 1.5rem; }
+  .lb-next { right: 1.5rem; }
+
+  /* ============================================================
+     Experience
+  ============================================================ */
+  .exp-grid { display: grid; grid-template-columns: 0.9fr 1.4fr; gap: clamp(2rem,6vw,6rem); }
+  .timeline { border-left: 1px solid var(--line); }
+  .tl-item { position: relative; padding: 0 0 3rem 2.4rem; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before {
+    content: "";
+    position: absolute;
+    left: -5px; top: 8px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .tl-year { font-family: var(--serif-en); font-style: italic; color: var(--gold); font-size: 1.05rem; }
+  .tl-role { font-family: var(--serif-en); font-size: 1.6rem; font-weight: 500; margin: .2rem 0 .3rem; }
+  .tl-org { font-family: var(--serif-cn); font-weight: 300; color: var(--muted); font-size: .95rem; }
+  @media (max-width: 860px) { .exp-grid { grid-template-columns: 1fr; } }
+
+  /* ============================================================
+     Contact
+  ============================================================ */
+  .contact { background: linear-gradient(165deg, #14100a 0%, #080706 100%); color: var(--ink); }
+  .contact .eyebrow { color: var(--gold-light); }
+  .contact .eyebrow::before { background: var(--gold-light); }
+  .contact-title {
+    font-family: var(--serif-en);
+    font-size: clamp(2.8rem, 10vw, 9rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .contact-title em { font-style: italic; color: var(--gold-light); }
+  .contact-mail {
+    display: inline-block;
+    font-family: var(--serif-en);
+    font-size: clamp(1.4rem, 4vw, 2.6rem);
+    font-style: italic;
+    margin-top: 2.4rem;
+    border-bottom: 1px solid rgba(244,239,230,.3);
+    padding-bottom: .3rem;
+    transition: border-color .4s var(--ease), letter-spacing .4s var(--ease);
+  }
+  .contact-mail:hover { border-color: var(--gold-light); letter-spacing: 0.02em; }
+  .contact-foot {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: clamp(4rem, 12vh, 8rem);
+    padding-top: 2.2rem;
+    border-top: 1px solid rgba(244,239,230,.15);
+    font-size: .74rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(244,239,230,.6);
+  }
+  .contact-social { display: flex; gap: 2rem; }
+  .contact-social a { position: relative; }
+  .contact-social a:hover { color: var(--gold-light); }
+</style>
+</head>
+<body>
+
+  <!-- Custom cursor -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="pre-count" id="preCount">0</div>
+    <div class="pre-label">Portfolio · 作品集</div>
+  </div>
+
+  <!-- Nav -->
+  <nav>
+    <a href="#top" class="nav-logo" data-hover>Vicma<span>.</span></a>
+    <div class="nav-links">
+      <a href="#about" data-hover>关于 / About</a>
+      <a href="#work" data-hover>作品 / Work</a>
+      <a href="#experience" data-hover>履历 / Path</a>
+      <a href="#contact" data-hover>联系 / Contact</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero" id="top">
+    <div class="wrap">
+      <div class="hero-sub reveal">Independent Designer &amp; Creative — Based in Shanghai</div>
+      <h1 class="hero-title reveal d1">Vicma Ying<em>.</em></h1>
+      <div class="hero-cn reveal d2">漠然 · 独立设计师</div>
+      <div class="hero-meta reveal d3">
+        <p class="lead">以设计为语言，在秩序与感性之间，为品牌构建可被记住的视觉与体验。</p>
+        <p>Crafting brands, interfaces &amp; stories where structure meets emotion — every detail considered.</p>
+      </div>
+    </div>
+    <div class="scroll-cue">
+      <span>Scroll</span>
+      <span class="bar"></span>
+    </div>
+  </header>
+
+  <!-- Marquee -->
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>Brand Identity</span><span>视觉设计</span><span>Art Direction</span><span>用户体验</span><span>Editorial</span><span>创意策略</span>
+      <span>Brand Identity</span><span>视觉设计</span><span>Art Direction</span><span>用户体验</span><span>Editorial</span><span>创意策略</span>
+    </div>
+  </div>
+
+  <!-- About -->
+  <section id="about">
+    <div class="wrap about-grid">
+      <div class="about-portrait reveal">
+        <span class="tag">Est. 2023 · Shanghai</span>
+      </div>
+      <div>
+        <div class="eyebrow reveal">About · 关于</div>
+        <h2 class="about-title reveal d1">Design is a way of <em>thinking</em>, not decorating.</h2>
+        <p class="about-text reveal d1">我是漠然，一名独立设计师与创作者。过去三年，我为科技、消费与文化领域的品牌打磨从策略到落地的完整体验，相信真正的高级感源于克制、秩序与对细节的偏执。</p>
+        <p class="about-text reveal d2">I partner with founders and teams to translate ambition into identities, products and stories that feel effortless — and endure.</p>
+        <div class="about-stats reveal d2">
+          <div class="stat"><div class="num">3<sup>+</sup></div><div class="label">Years 经验</div></div>
+          <div class="stat"><div class="num">60<sup>+</sup></div><div class="label">Projects 项目</div></div>
+          <div class="stat"><div class="num">12</div><div class="label">Awards 荣誉</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Works -->
+  <section id="work">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow reveal">Selected Work</div>
+          <h2 class="reveal d1">Selected <em>Works</em></h2>
+        </div>
+        <div class="cn reveal d1">精选作品 · 2024—2025</div>
+      </div>
+      <div class="works">
+        <a class="work reveal" data-hover data-img="assets/works/puppy-03.png" href="#feature">
+          <span class="idx">01</span>
+          <span class="title">Puppy TrashBin<small>宠物家居收纳视觉 · Product Branding</small></span>
+          <span class="cat">Product · Branding</span>
+          <span class="year">2025</span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="work reveal" data-hover data-img="assets/works/controller-01.jpg" href="#renders">
+          <span class="idx">02</span>
+          <span class="title">Nebula Controller<small>游戏手柄产品渲染 · Product CGI</small></span>
+          <span class="cat">Product · CGI</span>
+          <span class="year">2025</span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="work reveal" data-hover data-img="assets/works/watch-01.jpg" href="#renders">
+          <span class="idx">03</span>
+          <span class="title">Titan Ultra<small>智能腕表视觉 · Wearable</small></span>
+          <span class="cat">Wearable · Visual</span>
+          <span class="year">2025</span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="work reveal" data-hover data-img="assets/works/earbuds-01.png" href="#renders">
+          <span class="idx">04</span>
+          <span class="title">Echo Buds<small>无线耳机产品视觉 · Audio</small></span>
+          <span class="cat">Product · Audio</span>
+          <span class="year">2024</span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="work reveal" data-hover data-img="assets/works/penholder-01.jpg" href="#renders">
+          <span class="idx">05</span>
+          <span class="title">UNIT Desk System<small>桌面收纳系统 · Editorial</small></span>
+          <span class="cat">Editorial · Set</span>
+          <span class="year">2024</span>
+          <span class="arrow">↗</span>
+        </a>
+        <a class="work reveal" data-hover data-img="assets/works/kitchen-01.jpg" href="#renders">
+          <span class="idx">06</span>
+          <span class="title">Pantry Stack<small>宠食收纳系统 · Product</small></span>
+          <span class="cat">Product · System</span>
+          <span class="year">2024</span>
+          <span class="arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Floating preview -->
+  <div class="work-preview"><div class="pv" id="pvText"></div></div>
+
+  <!-- Featured project: Puppy TrashBin -->
+  <section class="feature" id="feature">
+    <div class="wrap">
+      <div class="feature-head">
+        <div>
+          <div class="eyebrow reveal">Featured Case</div>
+          <h2 class="reveal d1">Puppy <em>TrashBin</em></h2>
+        </div>
+        <div>
+          <p class="cn reveal d1">为儿童居家场景打造的宠物收纳桶产品视觉 —— 以奶油白与暖棕勾勒治愈感，手绘小狗形象贯穿台式与高脚两种形态、多种容量规格，并延展出绿 / 红 / 黄三款配色，在真实空间中呈现温柔而克制的品牌调性。</p>
+          <div class="feature-meta reveal d2">
+            <span>Category — <b>Product · Branding</b></span>
+            <span>Year — <b>2025</b></span>
+            <span>Role — <b>Art Direction</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery">
+        <figure class="shot lg reveal" data-full="assets/works/bin-01.jpg">
+          <img src="assets/works/bin-01.jpg" alt="Puppy TrashBin — 高脚系列三色儿童房场景" loading="lazy" />
+          <figcaption>Playroom · 三色系列</figcaption>
+        </figure>
+        <figure class="shot sm reveal d1" data-full="assets/works/puppy-03.png">
+          <img src="assets/works/puppy-03.png" alt="Puppy TrashBin — 三件套卧室场景" loading="lazy" />
+          <figcaption>Bedroom Set · 三件套</figcaption>
+        </figure>
+        <figure class="shot md reveal" data-full="assets/works/puppy-01.png">
+          <img src="assets/works/puppy-01.png" alt="Puppy TrashBin — 儿童书房场景" loading="lazy" />
+          <figcaption>Nursery · 书房</figcaption>
+        </figure>
+        <figure class="shot md reveal d1" data-full="assets/works/puppy-02.png">
+          <img src="assets/works/puppy-02.png" alt="Puppy TrashBin — 三规格并排展示" loading="lazy" />
+          <figcaption>Size Range · 三规格</figcaption>
+        </figure>
+        <figure class="shot md reveal" data-full="assets/works/puppy-04.png">
+          <img src="assets/works/puppy-04.png" alt="Puppy TrashBin — 儿童房陈设" loading="lazy" />
+          <figcaption>Playroom · 儿童房</figcaption>
+        </figure>
+        <figure class="shot md reveal d1" data-full="assets/works/bin-04.jpg">
+          <img src="assets/works/bin-04.jpg" alt="Puppy TrashBin — 高脚款细节" loading="lazy" />
+          <figcaption>Tall Series · 高脚款</figcaption>
+        </figure>
+        <figure class="shot sm reveal" data-full="assets/works/bin-02.jpg">
+          <img src="assets/works/bin-02.jpg" alt="Puppy TrashBin — 绿色款场景" loading="lazy" />
+          <figcaption>Mint · 薄荷绿</figcaption>
+        </figure>
+        <figure class="shot sm reveal d1" data-full="assets/works/bin-03.jpg">
+          <img src="assets/works/bin-03.jpg" alt="Puppy TrashBin — 黄色款场景" loading="lazy" />
+          <figcaption>Amber · 暖阳黄</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured project: Product Renders -->
+  <section class="feature" id="renders" style="background: var(--ivory);">
+    <div class="wrap">
+      <div class="feature-head">
+        <div>
+          <div class="eyebrow reveal">Product Renders</div>
+          <h2 class="reveal d1">Objects in <em>Light</em></h2>
+        </div>
+        <div>
+          <p class="cn reveal d1">一组产品视觉渲染 —— 从游戏手柄、智能腕表到无线耳机与桌面收纳，用光影、材质与克制的场景，让每一件器物在黑金基调下呈现应有的分量与质感。</p>
+          <div class="feature-meta reveal d2">
+            <span>Category — <b>Product · CGI</b></span>
+            <span>Year — <b>2024 – 2025</b></span>
+            <span>Role — <b>Visual &amp; Lighting</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="gallery">
+        <figure class="shot lg reveal" data-full="assets/works/controller-01.jpg">
+          <img src="assets/works/controller-01.jpg" alt="Nebula Controller — 暗调游戏手柄渲染" loading="lazy" />
+          <figcaption>Nebula · 游戏手柄</figcaption>
+        </figure>
+        <figure class="shot sm reveal d1" data-full="assets/works/earbuds-01.png">
+          <img src="assets/works/earbuds-01.png" alt="Echo Buds — 无线耳机与充电盒" loading="lazy" />
+          <figcaption>Echo Buds · 无线耳机</figcaption>
+        </figure>
+        <figure class="shot md reveal" data-full="assets/works/watch-01.jpg">
+          <img src="assets/works/watch-01.jpg" alt="Titan Ultra — 智能腕表双色表带" loading="lazy" />
+          <figcaption>Titan Ultra · 智能腕表</figcaption>
+        </figure>
+        <figure class="shot md reveal d1" data-full="assets/works/penholder-01.jpg">
+          <img src="assets/works/penholder-01.jpg" alt="UNIT Desk System — 桌面收纳编辑视觉" loading="lazy" />
+          <figcaption>UNIT · 桌面收纳</figcaption>
+        </figure>
+        <figure class="shot md reveal" data-full="assets/works/kitchen-01.jpg">
+          <img src="assets/works/kitchen-01.jpg" alt="Pantry Stack — 厨房台面收纳系统" loading="lazy" />
+          <figcaption>Pantry Stack · 收纳系统</figcaption>
+        </figure>
+        <figure class="shot md reveal d1" data-full="assets/works/controller-02.jpg">
+          <img src="assets/works/controller-02.jpg" alt="Nebula Controller — 手柄细节角度" loading="lazy" />
+          <figcaption>Nebula · 细节</figcaption>
+        </figure>
+        <figure class="shot sm reveal" data-full="assets/works/earbuds-02.png">
+          <img src="assets/works/earbuds-02.png" alt="Echo Buds — 耳机侧面视角" loading="lazy" />
+          <figcaption>Echo Buds · 侧面</figcaption>
+        </figure>
+        <figure class="shot sm reveal d1" data-full="assets/works/kitchen-02.jpg">
+          <img src="assets/works/kitchen-02.jpg" alt="Pantry Stack — 收纳系统场景二" loading="lazy" />
+          <figcaption>Pantry · 场景</figcaption>
+        </figure>
+        <figure class="shot sm reveal d2" data-full="assets/works/kitchen-03.jpg">
+          <img src="assets/works/kitchen-03.jpg" alt="Pantry Stack — 收纳系统场景三" loading="lazy" />
+          <figcaption>Pantry · 细节</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <span class="lb-close" id="lbClose" data-hover>&times;</span>
+    <span class="lb-nav lb-prev" id="lbPrev" data-hover>&lsaquo;</span>
+    <img src="" alt="preview" id="lbImg" />
+    <span class="lb-nav lb-next" id="lbNext" data-hover>&rsaquo;</span>
+  </div>
+
+  <!-- Experience -->
+  <section id="experience">
+    <div class="wrap exp-grid">
+      <div>
+        <div class="eyebrow reveal">Path · 履历</div>
+        <h2 class="about-title reveal d1">A quiet, <em>deliberate</em> path.</h2>
+        <p class="about-text reveal d1">从代理公司到独立工作室，每一步都在追求更纯粹的表达与更长期的价值。</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item reveal">
+          <div class="tl-year">2025 — Now</div>
+          <div class="tl-role">Founder &amp; Design Lead</div>
+          <div class="tl-org">Vicma Studio · 独立设计工作室</div>
+        </div>
+        <div class="tl-item reveal d1">
+          <div class="tl-year">2024 — 2025</div>
+          <div class="tl-role">Senior Product Designer</div>
+          <div class="tl-org">Nova Tech · 资深产品设计师</div>
+        </div>
+        <div class="tl-item reveal d2">
+          <div class="tl-year">2023 — 2024</div>
+          <div class="tl-role">Visual Designer</div>
+          <div class="tl-org">Atelier Ink · 视觉设计师</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="eyebrow reveal">Contact · 联系</div>
+      <h2 class="contact-title reveal d1">Let&rsquo;s create<br />something <em>lasting</em>.</h2>
+      <br />
+      <a class="contact-mail reveal d2" data-hover href="mailto:hello@moran.studio">hello@moran.studio</a>
+      <div class="contact-foot reveal d2">
+        <span>© 2025 Vicma Ying — 漠然</span>
+        <div class="contact-social">
+          <a href="#" data-hover>Instagram</a>
+          <a href="#" data-hover>Behance</a>
+          <a href="#" data-hover>微信 / WeChat</a>
+        </div>
+        <span>Designed with intention.</span>
+      </div>
+    </div>
+  </section>
+
+<script>
+  /* ---------- Preloader counter ---------- */
+  (function () {
+    var el = document.getElementById('preCount');
+    var pre = document.getElementById('preloader');
+    var n = 0;
+    var timer = setInterval(function () {
+      n += Math.floor(Math.random() * 8) + 3;
+      if (n >= 100) { n = 100; clearInterval(timer); setTimeout(finish, 500); }
+      el.textContent = n;
+    }, 90);
+    function finish() {
+      pre.classList.add('done');
+      document.body.style.overflow = '';
+      startReveal();
+    }
+    document.body.style.overflow = 'hidden';
+  })();
+
+  /* ---------- Scroll reveal ---------- */
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.16 });
+  function startReveal() {
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- Custom cursor ---------- */
+  (function () {
+    var dot = document.querySelector('.cursor-dot');
+    var ring = document.querySelector('.cursor-ring');
+    if (!dot) return;
+    var mx = 0, my = 0, rx = 0, ry = 0;
+    window.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+    });
+    (function loop() {
+      rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(loop);
+    })();
+    document.querySelectorAll('[data-hover]').forEach(function (el) {
+      el.addEventListener('mouseenter', function () { ring.classList.add('hover'); });
+      el.addEventListener('mouseleave', function () { ring.classList.remove('hover'); });
+    });
+  })();
+
+  /* ---------- Work hover preview ---------- */
+  (function () {
+    var preview = document.querySelector('.work-preview');
+    var pv = preview ? preview.querySelector('.pv') : null;
+    if (!pv) return;
+    var tx = 0, ty = 0, cx = 0, cy = 0, active = false;
+    document.querySelectorAll('.work').forEach(function (w) {
+      w.addEventListener('mouseenter', function () {
+        var img = w.getAttribute('data-img');
+        var grad = w.getAttribute('data-grad');
+        if (img) { pv.style.backgroundImage = 'url("' + img + '")'; pv.textContent = ''; }
+        else { pv.style.backgroundImage = grad || '#333'; pv.textContent = ''; }
+        preview.classList.add('show'); active = true;
+      });
+      w.addEventListener('mouseleave', function () { preview.classList.remove('show'); active = false; });
+    });
+    window.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; });
+    (function loop() {
+      cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
+      if (active) { preview.style.left = cx + 'px'; preview.style.top = cy + 'px'; }
+      requestAnimationFrame(loop);
+    })();
+  })();
+
+  /* ---------- Lightbox gallery ---------- */
+  (function () {
+    var lb = document.getElementById('lightbox');
+    var lbImg = document.getElementById('lbImg');
+    if (!lb) return;
+    var shots = Array.prototype.slice.call(document.querySelectorAll('.shot'));
+    var srcs = shots.map(function (s) { return s.getAttribute('data-full'); });
+    var idx = 0;
+    function open(i) { idx = i; lbImg.src = srcs[idx]; lb.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function close() { lb.classList.remove('open'); document.body.style.overflow = ''; }
+    function go(step) { idx = (idx + step + srcs.length) % srcs.length; lbImg.src = srcs[idx]; }
+    shots.forEach(function (s, i) { s.addEventListener('click', function () { open(i); }); });
+    document.getElementById('lbClose').addEventListener('click', close);
+    document.getElementById('lbPrev').addEventListener('click', function (e) { e.stopPropagation(); go(-1); });
+    document.getElementById('lbNext').addEventListener('click', function (e) { e.stopPropagation(); go(1); });
+    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === 'ArrowRight') go(1);
+    });
+  })();
+
+  /* ---------- Subtle hero parallax ---------- */
+  (function () {
+    var title = document.querySelector('.hero-title');
+    if (!title) return;
+    window.addEventListener('scroll', function () {
+      var y = window.scrollY;
+      if (y < window.innerHeight) title.style.transform = 'translateY(' + (y * 0.12) + 'px)';
+    }, { passive: true });
+  })();
+</script>
+</body>
+</html>
